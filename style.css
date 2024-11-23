@@ -1,5 +1,26 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;500;600;700&family=Rubik:wght@300;400;500;600;700;800&display=swap");
 
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -1;
+}
+
+.content {
+  z-index: 1;
+}
+
 .paper {
   background-color: rgb(255, 255, 255);
   top: 30%;
@@ -12,19 +33,10 @@
   text-align: center;
 }
 
-.content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  text-align: center;
-  color: #fff; /* Warna teks */
-}
-
 .paper.image {
   padding: 10px;
 }
+
 .paper.image p {
   font-size: 20px;
 }
@@ -34,6 +46,7 @@ img {
   width: 100%;
   user-select: none;
 }
+
 @keyframes glow {
   0%,
   100% {
@@ -50,7 +63,7 @@ img {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  color: #fff; /* Warna teks sesuai kebutuhan Anda */
+  color: #fff;
 }
 
 p {
