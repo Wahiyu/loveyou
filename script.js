@@ -16,17 +16,17 @@ class Paper {
   rotating = false;
 
   init(paper) {
-    document.addEventListener("mousemove", (e) => {
+    const onMove = (e) => {
       if (!this.rotating) {
-        this.mouseX = e.clientX;
-        this.mouseY = e.clientY;
+        this.mouseX = e.clientX || e.touches[0].clientX;
+        this.mouseY = e.clientY || e.touches[0].clientY;
 
         this.velX = this.mouseX - this.prevMouseX;
         this.velY = this.mouseY - this.prevMouseY;
       }
 
-      const dirX = e.clientX - this.mouseTouchX;
-      const dirY = e.clientY - this.mouseTouchY;
+      const dirX = this.mouseX - this.mouseTouchX;
+      const dirY = this.mouseY - this.mouseTouchY;
       const dirLength = Math.sqrt(dirX * dirX + dirY * dirY);
       const dirNormalizedX = dirX / dirLength;
       const dirNormalizedY = dirY / dirLength;
@@ -48,28 +48,40 @@ class Paper {
 
         paper.style.transform = `translateX(${this.currentPaperX}px) translateY(${this.currentPaperY}px) rotateZ(${this.rotation}deg)`;
       }
-    });
+    };
+
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("touchmove", onMove);
 
     paper.addEventListener("mousedown", (e) => {
       if (this.holdingPaper) return;
       this.holdingPaper = true;
-
       paper.style.zIndex = highestZ;
       highestZ += 1;
 
-      if (e.button === 0) {
+      if (e.button === 0 || e.type === "touchstart") {
         this.mouseTouchX = this.mouseX;
         this.mouseTouchY = this.mouseY;
         this.prevMouseX = this.mouseX;
         this.prevMouseY = this.mouseY;
       }
-      if (e.button === 2) {
+      if (e.button === 2 || e.type === "touchstart") {
         this.rotating = true;
       }
     });
+
     window.addEventListener("mouseup", () => {
       this.holdingPaper = false;
       this.rotating = false;
+    });
+    window.addEventListener("touchend", () => {
+      this.holdingPaper = false;
+      this.rotating = false;
+    });
+
+    // Prevent default context menu for right-click
+    paper.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
     });
   }
 }
@@ -80,6 +92,7 @@ papers.forEach((paper) => {
   const p = new Paper();
   p.init(paper);
 });
+
 document.addEventListener("DOMContentLoaded", function () {
   const lyrics = [" ", " ", " ", " ", " ", "KARENA AKU ", "MENCINTAIMU ", "DAN HATIKU", "HANYA UNTUKMU", "TAK AKAN MENYERAH", "DAN TAKAN BERHENTI", "MENCINTAIMU", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "];
 
@@ -110,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     setTimeout(function () {
-      window.location.href = "";
+      window.location.href = ""; // You can specify a URL or use `location.reload()` for refresh
     }, 700);
   }
 
