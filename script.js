@@ -94,7 +94,11 @@ papers.forEach((paper) => {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  const lyrics = [" ", " ", " ", " ", " ", "KARENA AKU ", "MENCINTAIMU ", "DAN HATIKU", "HANYA UNTUKMU", "TAK AKAN MENYERAH", "DAN TAKAN BERHENTI", "MENCINTAIMU", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "];
+  const lyrics = [
+    " ", " ", " ", " ", " ", "KARENA AKU ", "MENCINTAIMU ", "DAN HATIKU", 
+    "HANYA UNTUKMU", "TAK AKAN MENYERAH", "DAN TAKAN BERHENTI", "MENCINTAIMU", 
+    " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
+  ];
 
   const delay = 41;
   const lyricsElement = document.getElementById("lyrics");
@@ -123,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     setTimeout(function () {
-      window.location.href = ""; // You can specify a URL or use `location.reload()` for refresh
+      window.location.href = "";
     }, 700);
   }
 
