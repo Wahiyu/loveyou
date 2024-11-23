@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     setTimeout(function () {
-      window.location.href = "yournexthtmlfile.html";
+      window.location.href = "";
     }, 700);
   }
 
