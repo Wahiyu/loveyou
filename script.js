@@ -2,86 +2,61 @@ let highestZ = 1;
 
 class Paper {
   holdingPaper = false;
-  mouseTouchX = 0;
-  mouseTouchY = 0;
-  mouseX = 0;
-  mouseY = 0;
-  prevMouseX = 0;
-  prevMouseY = 0;
-  velX = 0;
-  velY = 0;
-  rotation = Math.random() * 30 - 15;
+  touchStartX = 0;
+  touchStartY = 0;
   currentPaperX = 0;
   currentPaperY = 0;
-  rotating = false;
+  lastTouchTime = 0;
 
   init(paper) {
-    const onMove = (e) => {
-      e.preventDefault();
-      const isTouch = e.type.includes("touch");
-      this.mouseX = isTouch ? e.touches[0].clientX : e.clientX;
-      this.mouseY = isTouch ? e.touches[0].clientY : e.clientY;
-
-      if (this.holdingPaper) {
-        this.velX = this.mouseX - this.prevMouseX;
-        this.velY = this.mouseY - this.prevMouseY;
-
-        this.currentPaperX += this.velX;
-        this.currentPaperY += this.velY;
-
-        paper.style.transform = `translate(${this.currentPaperX}px, ${this.currentPaperY}px) rotateZ(${this.rotation}deg)`;
-      }
-
-      this.prevMouseX = this.mouseX;
-      this.prevMouseY = this.mouseY;
+    const updatePosition = () => {
+      paper.style.transform = `translate(${this.currentPaperX}px, ${this.currentPaperY}px)`;
+      paper.style.zIndex = highestZ++;
     };
-
-    const onEnd = () => {
-      this.holdingPaper = false;
-      this.rotating = false;
-    };
-
-    paper.addEventListener("mousedown", (e) => {
-      this.startDrag(e);
-    });
 
     paper.addEventListener("touchstart", (e) => {
-      this.startDrag(e);
+      e.preventDefault();
+      const touch = e.touches[0];
+      this.holdingPaper = true;
+      this.touchStartX = touch.clientX - this.currentPaperX;
+      this.touchStartY = touch.clientY - this.currentPaperY;
+
+      paper.style.transition = "none"; // Disable smooth transition
     });
 
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("touchmove", onMove);
+    paper.addEventListener("touchmove", (e) => {
+      if (!this.holdingPaper) return;
+      const touch = e.touches[0];
+      this.currentPaperX = touch.clientX - this.touchStartX;
+      this.currentPaperY = touch.clientY - this.touchStartY;
+      requestAnimationFrame(updatePosition);
+    });
 
-    window.addEventListener("mouseup", onEnd);
-    window.addEventListener("touchend", onEnd);
-
-    paper.addEventListener("contextmenu", (e) => e.preventDefault());
-  }
-
-  startDrag(e) {
-    const isTouch = e.type.includes("touch");
-    this.holdingPaper = true;
-    this.mouseTouchX = isTouch ? e.touches[0].clientX : e.clientX;
-    this.mouseTouchY = isTouch ? e.touches[0].clientY : e.clientY;
-    this.prevMouseX = this.mouseTouchX;
-    this.prevMouseY = this.mouseTouchY;
-    e.target.style.zIndex = highestZ++;
+    paper.addEventListener("touchend", () => {
+      this.holdingPaper = false;
+    });
   }
 }
 
 const papers = Array.from(document.querySelectorAll(".paper"));
 papers.forEach((paper) => new Paper().init(paper));
 
-// Kontrol Video Background
+// Kontrol Video dengan Double-Tap
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("video");
-  let videoPaused = false;
+  let lastTapTime = 0;
 
-  document.addEventListener("click", (e) => {
-    if (e.target.id === "video" || e.target.closest("#background")) {
-      videoPaused = !videoPaused;
-      videoPaused ? video.pause() : video.play();
+  document.addEventListener("touchend", (e) => {
+    const currentTime = new Date().getTime();
+    if (currentTime - lastTapTime < 300) {
+      // Deteksi Double-Tap
+      if (video.paused) {
+        video.play();
+      } else {
+        video.pause();
+      }
     }
+    lastTapTime = currentTime;
   });
 
   const lyrics = ["KARENA AKU", "MENCINTAIMU", "DAN HATIKU", "HANYA UNTUKMU", "TAK AKAN MENYERAH", "DAN TAKAN BERHENTI", "MENCINTAIMU"];
