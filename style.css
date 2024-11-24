@@ -24,6 +24,13 @@ video {
   z-index: 1;
 }
 
+.text {
+ position: absolute;
+ top: 10px; /* Posisi di atas */
+ text-align: center;
+ font-size: 24px;
+}
+
 .paper {
   background-color: rgb(255, 255, 255);
   top: 30%;
