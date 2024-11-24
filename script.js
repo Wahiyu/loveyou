@@ -2,55 +2,44 @@ let highestZ = 1;
 
 class Paper {
   holdingPaper = false;
-  startX = 0;
-  startY = 0;
-  currentX = 0;
-  currentY = 0;
-  offsetX = 0;
-  offsetY = 0;
+  touchStartX = 0;
+  touchStartY = 0;
+  currentPaperX = 0;
+  currentPaperY = 0;
 
   init(paper) {
-    const movePaper = (e) => {
+    const updatePosition = () => {
+      paper.style.transform = `translate(${this.currentPaperX}px, ${this.currentPaperY}px)`;
+      paper.style.zIndex = highestZ++;
+    };
+
+    paper.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      this.holdingPaper = true;
+      this.touchStartX = touch.clientX - this.currentPaperX;
+      this.touchStartY = touch.clientY - this.currentPaperY;
+      paper.style.transition = "none"; // Disable smooth transition
+    });
+
+    paper.addEventListener("touchmove", (e) => {
       if (!this.holdingPaper) return;
+      const touch = e.touches[0];
+      this.currentPaperX = touch.clientX - this.touchStartX;
+      this.currentPaperY = touch.clientY - this.touchStartY;
+      requestAnimationFrame(updatePosition); // Optimize for smooth movement
+    });
 
-      const touch = e.touches ? e.touches[0] : e;
-      this.currentX = touch.clientX - this.offsetX;
-      this.currentY = touch.clientY - this.offsetY;
-
-      paper.style.transform = `translate(${this.currentX}px, ${this.currentY}px)`;
-    };
-
-    const stopDragging = () => {
+    paper.addEventListener("touchend", () => {
       this.holdingPaper = false;
-    };
-
-    paper.addEventListener("mousedown", (e) => this.startDrag(e, paper));
-    paper.addEventListener("touchstart", (e) => this.startDrag(e.touches[0], paper));
-
-    document.addEventListener("mousemove", movePaper);
-    document.addEventListener("touchmove", movePaper);
-
-    document.addEventListener("mouseup", stopDragging);
-    document.addEventListener("touchend", stopDragging);
-  }
-
-  startDrag(e, paper) {
-    this.holdingPaper = true;
-    const rect = paper.getBoundingClientRect();
-
-    this.offsetX = e.clientX - rect.left;
-    this.offsetY = e.clientY - rect.top;
-
-    paper.style.zIndex = highestZ++;
-    paper.style.transition = "none";
+    });
   }
 }
 
-// Inisialisasi elemen paper
 const papers = Array.from(document.querySelectorAll(".paper.image"));
 papers.forEach((paper) => new Paper().init(paper));
 
-// Double-tap untuk video
+// Kontrol Video dengan Double-Tap
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("video");
   let lastTapTime = 0;
@@ -58,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("touchend", (e) => {
     const currentTime = new Date().getTime();
     if (currentTime - lastTapTime < 300) {
+      // Deteksi Double-Tap
       if (video.paused) {
         video.play();
       } else {
@@ -66,11 +56,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     lastTapTime = currentTime;
 
-    // Aktifkan suara jika masih mute
+    // Aktifkan suara video jika dimute
     video.muted = false;
   });
 
-  // Tampilkan lirik satu per satu
   const lyrics = [
     { text: "MENCINTAIMU", delay: 14000 },
     { text: "DAN HATIKU", delay: 17000 },
