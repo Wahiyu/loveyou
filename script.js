@@ -1,55 +1,12 @@
-let highestZ = 1;
-
-class Paper {
-  holdingPaper = false;
-  touchStartX = 0;
-  touchStartY = 0;
-  currentPaperX = 0;
-  currentPaperY = 0;
-  lastTouchTime = 0;
-
-  init(paper) {
-    const updatePosition = () => {
-      paper.style.transform = `translate(${this.currentPaperX}px, ${this.currentPaperY}px)`;
-      paper.style.zIndex = highestZ++;
-    };
-
-    paper.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      this.holdingPaper = true;
-      this.touchStartX = touch.clientX - this.currentPaperX;
-      this.touchStartY = touch.clientY - this.currentPaperY;
-
-      paper.style.transition = "none"; // Disable smooth transition
-    });
-
-    paper.addEventListener("touchmove", (e) => {
-      if (!this.holdingPaper) return;
-      const touch = e.touches[0];
-      this.currentPaperX = touch.clientX - this.touchStartX;
-      this.currentPaperY = touch.clientY - this.touchStartY;
-      requestAnimationFrame(updatePosition);
-    });
-
-    paper.addEventListener("touchend", () => {
-      this.holdingPaper = false;
-    });
-  }
-}
-
-const papers = Array.from(document.querySelectorAll(".paper"));
-papers.forEach((paper) => new Paper().init(paper));
-
-// Kontrol Video dengan Double-Tap
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("video");
   let lastTapTime = 0;
 
+  // Aktifkan suara video dengan double-tap
   document.addEventListener("touchend", (e) => {
     const currentTime = new Date().getTime();
     if (currentTime - lastTapTime < 300) {
-      // Deteksi Double-Tap
+      // Double-tap terdeteksi
       if (video.paused) {
         video.play();
       } else {
@@ -57,33 +14,33 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     lastTapTime = currentTime;
+
+    // Aktifkan suara jika masih dalam keadaan mute
+    video.muted = false;
   });
 
-  const lyrics = ["KARENA AKU", "MENCINTAIMU", "DAN HATIKU", "HANYA UNTUKMU", "TAK AKAN MENYERAH", "DAN TAKAN BERHENTI", "MENCINTAIMU"];
-  const delay = 40;
   const lyricsElement = document.getElementById("lyrics");
+  const lyrics = [
+    { text: "MENCINTAIMU", delay: 14000 },
+    { text: "DAN HATIKU", delay: 17000 },
+    { text: "HANYA UNTUKMU", delay: 20500 },
+    { text: "TAK AKAN MENYERAH", delay: 24000 },
+    { text: "DAN TAKAN BERHENTI", delay: 27000 },
+    { text: "MENCINTAIMU", delay: 31000 },
+  ];
 
-  async function displayLyrics() {
-    for (const line of lyrics) {
-      for (const char of line) {
-        const charElement = document.createElement("span");
-        charElement.textContent = char;
-        charElement.style.animation = "glow 1.5s ease-in-out";
-        charElement.style.fontSize = "30px";
-        lyricsElement.appendChild(charElement);
+  // Fungsi untuk menampilkan lirik sesuai waktu
+  function displayLyrics() {
+    lyrics.forEach((lyric) => {
+      setTimeout(() => {
+        lyricsElement.textContent = lyric.text;
 
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
-
-      lyricsElement.appendChild(document.createElement("br"));
-      await new Promise((resolve) => setTimeout(resolve, delay * 20));
-    }
-
-    setTimeout(() => {
-      lyricsElement.textContent = ""; // Clear lyrics
-      window.location.href = ""; // Redirect or reload
-    }, 2000);
+        // Tambahkan animasi glow untuk efek teks
+        lyricsElement.style.animation = "glow 2s ease-in-out";
+      }, lyric.delay);
+    });
   }
 
+  // Jalankan fungsi untuk menampilkan lirik
   displayLyrics();
 });
