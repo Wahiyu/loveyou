@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     while (true) {
       for (const { text, time } of lyrics) {
         // Tunggu sampai waktu yang tepat untuk menampilkan lirik
-        await new Promise(resolve => setTimeout(resolve, time));
+        await new Promise((resolve) => setTimeout(resolve, time));
 
         // Hapus lirik yang sebelumnya
         lyricsElement.textContent = "";
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
           lyricsElement.appendChild(charElement);
 
           // Menampilkan setiap karakter dengan delay
-          await new Promise(resolve => setTimeout(resolve, 100)); // Kecepatan karakter muncul
+          await new Promise((resolve) => setTimeout(resolve, 100)); // Kecepatan karakter muncul
         }
       }
     }
@@ -40,7 +40,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Mulai menampilkan lirik saat video dimulai atau diulang
   video.addEventListener("play", () => {
-    // Mulai menampilkan lirik dari awal saat video dimulai
+    // Pastikan video diputar dengan suara
+    video.muted = false; // Mengaktifkan suara
     displayLyrics();
+  });
+
+  // Penanganan event untuk double click pada video untuk play/pause
+  video.addEventListener("dblclick", () => {
+    if (video.paused) {
+      video.play();
+    } else {
+      video.pause();
+    }
+  });
+
+  // Handle geser untuk div dengan class "paper image"
+  const paperImage = document.querySelector(".paper.image");
+  let isTouching = false;
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  paperImage.addEventListener("touchstart", (e) => {
+    isTouching = true;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  });
+
+  paperImage.addEventListener("touchmove", (e) => {
+    if (!isTouching) return;
+    const touchMoveX = e.touches[0].clientX;
+    const touchMoveY = e.touches[0].clientY;
+    const dx = touchMoveX - touchStartX;
+    const dy = touchMoveY - touchStartY;
+    paperImage.style.transform = `translate(${dx}px, ${dy}px)`;
+  });
+
+  paperImage.addEventListener("touchend", () => {
+    isTouching = false;
   });
 });
