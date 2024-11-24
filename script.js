@@ -61,12 +61,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const lyrics = [
-    { text: "MENCINTAIMU", delay: 14000 },
-    { text: "DAN HATIKU", delay: 17000 },
-    { text: "HANYA UNTUKMU", delay: 20500 },
-    { text: "TAK AKAN MENYERAH", delay: 24000 },
-    { text: "DAN TAKAN BERHENTI", delay: 27000 },
-    { text: "MENCINTAIMU", delay: 31000 },
+    { text: "KARENA AKU", time: 11000 }, // 11 detik
+    { text: "MENCINTAIMU", time: 14000 }, // 14 detik
+    { text: "DAN HATIKU", time: 17000 }, // 17 detik
+    { text: "HANYA UNTUKMU", time: 20500 }, // 20,5 detik
+    { text: "TAK AKAN MENYERAH", time: 24000 }, // 24 detik
+    { text: "DAN TAKAN BERHENTI", time: 27000 }, // 27 detik
+    { text: "MENCINTAIMU", time: 31000 }, // 31 detik
   ];
 
   const lyricsElement = document.getElementById("lyrics");
