@@ -24,32 +24,6 @@ video {
   z-index: 1;
 }
 
-.paper {
-  background-color: rgb(255, 255, 255);
-  top: 30%;
-  left: 40%;
-  padding: 20px 80px;
-  transform: rotateZ(-5deg);
-  box-shadow: 1px 15px 20px 0px rgba(0, 0, 0, 0.5);
-  position: absolute;
-  border-radius: 20px;
-  text-align: center;
-}
-
-.paper.image {
-  padding: 10px;
-}
-
-.paper.image p {
-  font-size: 20px;
-}
-
-img {
-  max-height: 200px;
-  width: 100%;
-  user-select: none;
-}
-
 @keyframes glow {
   0%,
   100% {
@@ -69,6 +43,23 @@ img {
   font-size: 40px;
   color: #fff;
   text-align: center;
+}
+
+.paper.image {
+  position: absolute;
+  padding: 20px;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  user-select: none;
+  touch-action: none;
+}
+
+.paper.image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
 }
 
 p {
