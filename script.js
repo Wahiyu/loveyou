@@ -17,90 +17,75 @@ class Paper {
 
   init(paper) {
     const onMove = (e) => {
-      if (!this.rotating) {
-        this.mouseX = e.clientX || e.touches[0].clientX;
-        this.mouseY = e.clientY || e.touches[0].clientY;
-
-        this.velX = this.mouseX - this.prevMouseX;
-        this.velY = this.mouseY - this.prevMouseY;
-      }
-
-      const dirX = this.mouseX - this.mouseTouchX;
-      const dirY = this.mouseY - this.mouseTouchY;
-      const dirLength = Math.sqrt(dirX * dirX + dirY * dirY);
-      const dirNormalizedX = dirX / dirLength;
-      const dirNormalizedY = dirY / dirLength;
-
-      const angle = Math.atan2(dirNormalizedY, dirNormalizedX);
-      let degrees = (180 * angle) / Math.PI;
-      degrees = (360 + Math.round(degrees)) % 360;
-      if (this.rotating) {
-        this.rotation = degrees;
-      }
+      e.preventDefault();
+      const isTouch = e.type.includes("touch");
+      this.mouseX = isTouch ? e.touches[0].clientX : e.clientX;
+      this.mouseY = isTouch ? e.touches[0].clientY : e.clientY;
 
       if (this.holdingPaper) {
-        if (!this.rotating) {
-          this.currentPaperX += this.velX;
-          this.currentPaperY += this.velY;
-        }
-        this.prevMouseX = this.mouseX;
-        this.prevMouseY = this.mouseY;
+        this.velX = this.mouseX - this.prevMouseX;
+        this.velY = this.mouseY - this.prevMouseY;
 
-        paper.style.transform = `translateX(${this.currentPaperX}px) translateY(${this.currentPaperY}px) rotateZ(${this.rotation}deg)`;
+        this.currentPaperX += this.velX;
+        this.currentPaperY += this.velY;
+
+        paper.style.transform = `translate(${this.currentPaperX}px, ${this.currentPaperY}px) rotateZ(${this.rotation}deg)`;
       }
+
+      this.prevMouseX = this.mouseX;
+      this.prevMouseY = this.mouseY;
     };
+
+    const onEnd = () => {
+      this.holdingPaper = false;
+      this.rotating = false;
+    };
+
+    paper.addEventListener("mousedown", (e) => {
+      this.startDrag(e);
+    });
+
+    paper.addEventListener("touchstart", (e) => {
+      this.startDrag(e);
+    });
 
     document.addEventListener("mousemove", onMove);
     document.addEventListener("touchmove", onMove);
 
-    paper.addEventListener("mousedown", (e) => {
-      if (this.holdingPaper) return;
-      this.holdingPaper = true;
-      paper.style.zIndex = highestZ;
-      highestZ += 1;
+    window.addEventListener("mouseup", onEnd);
+    window.addEventListener("touchend", onEnd);
 
-      if (e.button === 0 || e.type === "touchstart") {
-        this.mouseTouchX = this.mouseX;
-        this.mouseTouchY = this.mouseY;
-        this.prevMouseX = this.mouseX;
-        this.prevMouseY = this.mouseY;
-      }
-      if (e.button === 2 || e.type === "touchstart") {
-        this.rotating = true;
-      }
-    });
+    paper.addEventListener("contextmenu", (e) => e.preventDefault());
+  }
 
-    window.addEventListener("mouseup", () => {
-      this.holdingPaper = false;
-      this.rotating = false;
-    });
-    window.addEventListener("touchend", () => {
-      this.holdingPaper = false;
-      this.rotating = false;
-    });
-
-    // Prevent default context menu for right-click
-    paper.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-    });
+  startDrag(e) {
+    const isTouch = e.type.includes("touch");
+    this.holdingPaper = true;
+    this.mouseTouchX = isTouch ? e.touches[0].clientX : e.clientX;
+    this.mouseTouchY = isTouch ? e.touches[0].clientY : e.clientY;
+    this.prevMouseX = this.mouseTouchX;
+    this.prevMouseY = this.mouseTouchY;
+    e.target.style.zIndex = highestZ++;
   }
 }
 
 const papers = Array.from(document.querySelectorAll(".paper"));
+papers.forEach((paper) => new Paper().init(paper));
 
-papers.forEach((paper) => {
-  const p = new Paper();
-  p.init(paper);
-});
+// Kontrol Video Background
+document.addEventListener("DOMContentLoaded", () => {
+  const video = document.getElementById("video");
+  let videoPaused = false;
 
-document.addEventListener("DOMContentLoaded", function () {
-  const lyrics = [
-    " ", " ", " ", " ", " ", "KARENA AKU ", "MENCINTAIMU ", "DAN HATIKU", 
-    "HANYA UNTUKMU", "TAK AKAN MENYERAH", "DAN TAKAN BERHENTI", "MENCINTAIMU", 
-    " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-  ];
+  document.addEventListener("click", (e) => {
+    if (e.target.id === "video" || e.target.closest("#background")) {
+      videoPaused = !videoPaused;
+      videoPaused ? video.pause() : video.play();
+    }
+  });
 
-  const delay = 41;
+  const lyrics = ["KARENA AKU", "MENCINTAIMU", "DAN HATIKU", "HANYA UNTUKMU", "TAK AKAN MENYERAH", "DAN TAKAN BERHENTI", "MENCINTAIMU"];
+  const delay = 40;
   const lyricsElement = document.getElementById("lyrics");
 
   async function displayLyrics() {
@@ -108,27 +93,21 @@ document.addEventListener("DOMContentLoaded", function () {
       for (const char of line) {
         const charElement = document.createElement("span");
         charElement.textContent = char;
-        charElement.style.animation = "glow 2s ease-in-out";
+        charElement.style.animation = "glow 1.5s ease-in-out";
         charElement.style.fontSize = "30px";
         lyricsElement.appendChild(charElement);
 
         await new Promise((resolve) => setTimeout(resolve, delay));
-
-        charElement.style.animation = "";
       }
 
       lyricsElement.appendChild(document.createElement("br"));
-
-      await new Promise((resolve) => setTimeout(resolve, delay * 25));
-
-      lyricsElement.textContent = "";
-
-      await new Promise((resolve) => setTimeout(resolve, delay * 35));
+      await new Promise((resolve) => setTimeout(resolve, delay * 20));
     }
 
-    setTimeout(function () {
-      window.location.href = "";
-    }, 700);
+    setTimeout(() => {
+      lyricsElement.textContent = ""; // Clear lyrics
+      window.location.href = ""; // Redirect or reload
+    }, 2000);
   }
 
   displayLyrics();
