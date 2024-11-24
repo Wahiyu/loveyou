@@ -38,6 +38,7 @@ video {
 
 .paper.image {
   padding: 10px;
+  cursor: grab;
 }
 
 .paper.image p {
