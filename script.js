@@ -1,12 +1,63 @@
+let highestZ = 1;
+
+class Paper {
+  holdingPaper = false;
+  startX = 0;
+  startY = 0;
+  currentX = 0;
+  currentY = 0;
+  offsetX = 0;
+  offsetY = 0;
+
+  init(paper) {
+    const movePaper = (e) => {
+      if (!this.holdingPaper) return;
+
+      const touch = e.touches ? e.touches[0] : e;
+      this.currentX = touch.clientX - this.offsetX;
+      this.currentY = touch.clientY - this.offsetY;
+
+      paper.style.transform = `translate(${this.currentX}px, ${this.currentY}px)`;
+    };
+
+    const stopDragging = () => {
+      this.holdingPaper = false;
+    };
+
+    paper.addEventListener("mousedown", (e) => this.startDrag(e, paper));
+    paper.addEventListener("touchstart", (e) => this.startDrag(e.touches[0], paper));
+
+    document.addEventListener("mousemove", movePaper);
+    document.addEventListener("touchmove", movePaper);
+
+    document.addEventListener("mouseup", stopDragging);
+    document.addEventListener("touchend", stopDragging);
+  }
+
+  startDrag(e, paper) {
+    this.holdingPaper = true;
+    const rect = paper.getBoundingClientRect();
+
+    this.offsetX = e.clientX - rect.left;
+    this.offsetY = e.clientY - rect.top;
+
+    paper.style.zIndex = highestZ++;
+    paper.style.transition = "none";
+  }
+}
+
+// Inisialisasi elemen paper
+const papers = Array.from(document.querySelectorAll(".paper.image"));
+papers.forEach((paper) => new Paper().init(paper));
+
+// Double-tap untuk video
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("video");
   let lastTapTime = 0;
 
-  // Aktifkan suara video dengan double-tap
   document.addEventListener("touchend", (e) => {
     const currentTime = new Date().getTime();
     if (currentTime - lastTapTime < 300) {
-      // Double-tap terdeteksi
       if (video.paused) {
         video.play();
       } else {
@@ -15,11 +66,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     lastTapTime = currentTime;
 
-    // Aktifkan suara jika masih dalam keadaan mute
+    // Aktifkan suara jika masih mute
     video.muted = false;
   });
 
-  const lyricsElement = document.getElementById("lyrics");
+  // Tampilkan lirik satu per satu
   const lyrics = [
     { text: "MENCINTAIMU", delay: 14000 },
     { text: "DAN HATIKU", delay: 17000 },
@@ -29,18 +80,27 @@ document.addEventListener("DOMContentLoaded", () => {
     { text: "MENCINTAIMU", delay: 31000 },
   ];
 
-  // Fungsi untuk menampilkan lirik sesuai waktu
-  function displayLyrics() {
-    lyrics.forEach((lyric) => {
-      setTimeout(() => {
-        lyricsElement.textContent = lyric.text;
+  const lyricsElement = document.getElementById("lyrics");
 
-        // Tambahkan animasi glow untuk efek teks
-        lyricsElement.style.animation = "glow 2s ease-in-out";
-      }, lyric.delay);
-    });
+  async function displayLyrics() {
+    for (const { text, delay } of lyrics) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+
+      // Hapus lirik sebelumnya
+      lyricsElement.textContent = "";
+
+      // Tampilkan lirik satu per satu
+      for (const char of text) {
+        const charElement = document.createElement("span");
+        charElement.textContent = char;
+        charElement.style.animation = "glow 2s ease-in-out";
+        charElement.style.fontSize = "30px";
+        lyricsElement.appendChild(charElement);
+
+        await new Promise((resolve) => setTimeout(resolve, 100)); // Kecepatan karakter muncul
+      }
+    }
   }
 
-  // Jalankan fungsi untuk menampilkan lirik
   displayLyrics();
 });
